@@ -1,24 +1,20 @@
-FROM node:18 AS builder
+FROM node:18-alpine AS BUILD
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json .
 
 RUN npm install
-
-RUN npm rebuild esbuild
 
 COPY . .
 
 RUN npm run build
 
-FROM node:18-alpine
+FROM node:18-alpine AS PRODUCTION
 
 WORKDIR /app
 
-RUN npm install -g serve
-
-COPY --from=builder /app/dist ./dist
+COPY --from=BUILD /app/dist /app/dist
 
 EXPOSE 4444
 
