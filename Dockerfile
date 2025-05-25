@@ -3,10 +3,9 @@ FROM node:18-alpine AS BUILD
 WORKDIR /app
 
 COPY package.json .
+COPY package-lock.json . 
 
 RUN npm install
-
-RUN npm install serve
 
 COPY . .
 
@@ -16,8 +15,10 @@ FROM node:18-alpine AS PRODUCTION
 
 WORKDIR /app
 
+RUN npm install -g serve
+
 COPY --from=BUILD /app/dist /app/dist
 
 EXPOSE 4444
 
-CMD ["serve", "-s", "build", "-l", "4444"]
+CMD ["serve", "-s", "dist", "-l", "4444"]
