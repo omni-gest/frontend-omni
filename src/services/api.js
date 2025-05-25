@@ -1,8 +1,9 @@
 import axios from "axios";
 
 const api = axios.create({
-     baseURL: 'https://sistema-generico-api.vercel.app/api/api'
+     //baseURL: 'https://sistema-generico-api.vercel.app/api/api'
     // baseURL: 'http://localhost:8000/api'
+   baseURL: 'https://api.omnigest.tech/api'
 });
 
 api.interceptors.request.use(
