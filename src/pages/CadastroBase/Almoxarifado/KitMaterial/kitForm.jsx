@@ -20,6 +20,7 @@ const schema = yup.object().shape({
 export default function KitForm({ kitEditing, onClose, visible, refresh }) {
   const [form, setForm] = useState(kitEditing ?? {});
   const [error, setError] = useState({});
+  const [kitValue, setKitValue] = useState({});
   const [formData, setFormData] = useState({});
   const [materiaisOriginais, setMateriaisOriginais] = useState([]);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
@@ -123,13 +124,19 @@ export default function KitForm({ kitEditing, onClose, visible, refresh }) {
       inputData.materiaisInserir = materiaisInserir;
     */
     }
+    if(eventName == "vlr_combo_cmb") {
+      value = parseInt(parseCurrencyToInt(event.target.value))
+      const formattedValue  = formatCurrencyString(event.target.value);
+      setKitValue(value)
+      setForm((prev) => ({ ...prev, [eventName]: formattedValue}));
+    }
   };
 
   const handleSubmit = async (event) => {
     setLoadingSubmit(true);
     setTimeout(async () => {
       try {
-        form.vlr_combo_cmb = formatCurrencyString(form.vlr_combo_cmb);
+        form.vlr_combo_cmb = kitValue;
         const success = await createComboMaterial(form);
 
         if (success) {
