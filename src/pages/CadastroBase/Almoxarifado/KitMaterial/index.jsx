@@ -1,18 +1,16 @@
 import { useEffect, useState } from "react";
 
 
-
-
-
 import Content from "../../../../components/Content";
 import PageHeader from "../../../../components/PageHeader";
 
 import { getEstoque } from "../../../../services/estoque";
+import { getComboMateriais } from "../../../../services/comboMaterial";
 import { formatDate } from "../../../../utils/dateHelper";
-import EstoqueForm from "./estoqueForm";
-import EstoqueTable from "./estoqueTable";
+import KitForm from "./kitForm";
+import KitTable from "./kitTable";
 
-export default function Estoque() {
+export default function KitMaterial() {
 
     const [regs, setRegs] = useState([]);
 
@@ -23,8 +21,7 @@ export default function Estoque() {
     // Chamada da API - Lista todos os materiais
     const fetchServices = async (filter, pageNumber, totalSize) => {
         try {
-            const response = await getEstoque('', pageNumber, totalSize, null, true);
-            console.log(response)
+            const response = await getComboMateriais('', pageNumber, totalSize);
             setRegs(response.items);
             setTotalRows(response.total)
             setModalIsOpen(false)
@@ -52,8 +49,8 @@ export default function Estoque() {
                 exportFilename='export_estoque'
                 dataset={regs.map(reg=>({'ID':reg.id_estoque_est, 'Descrição': reg.des_estoque_est,'Centro de Custo': reg.id_centro_custo_est,'Data Criação': formatDate(reg.created_at)}))}
             />
-            <EstoqueTable totalRows={totalRows} data={regs} handleEdit={handleEdit} refresh={fetchServices}/>
-            {modalIsOpen && <EstoqueForm reg={regEdited} onClose={() => { setModalIsOpen(false) }} visible={modalIsOpen} refresh={fetchServices}/>}
+            <KitTable totalRows={totalRows} data={regs} handleEdit={handleEdit} refresh={fetchServices}/>
+            {modalIsOpen && <KitForm reg={regEdited} onClose={() => { setModalIsOpen(false) }} visible={modalIsOpen} refresh={fetchServices}/>}
         </Content>
     )
 }
