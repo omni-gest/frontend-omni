@@ -20,10 +20,10 @@ export default function KitTable({ data = [], handleEdit, refresh, totalRows }) 
   const columns = [
     {
       name: 'Ações',
-      cell: ({ id_estoque_est }) => (
+      cell: ({ id_combo }) => (
         <div>
-          <Button onClick={() => handleEdit(id_estoque_est)}>Editar</Button>
-          <Button onClick={() => handleDelete(id_estoque_est)}>Excluir</Button>
+          <Button onClick={() => handleEdit(id_combo)}>Editar</Button>
+          <Button onClick={() => handleDelete(id_combo)}>Excluir</Button>
         </div>
       ),
     },
@@ -49,7 +49,6 @@ export default function KitTable({ data = [], handleEdit, refresh, totalRows }) 
       format: ({ created_at }) => formatDate(created_at),
     },
   ];
-  console.log(data)
   return (
     <TableV2
       columns={columns}

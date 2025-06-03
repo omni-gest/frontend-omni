@@ -9,13 +9,14 @@ import { getComboMateriais } from "../../../../services/comboMaterial";
 import { formatDate } from "../../../../utils/dateHelper";
 import KitForm from "./kitForm";
 import KitTable from "./kitTable";
+import { formatCurrencyString, parseCurrencyToInt } from "../../../../utils/format";
 
 export default function KitMaterial() {
 
     const [regs, setRegs] = useState([]);
 
     const [totalRows, setTotalRows] = useState(0);
-    const [regEdited, setRegEdited] = useState({});
+    const [regEdited, setRegEdited] = useState(null);
     const [modalIsOpen, setModalIsOpen] = useState(false);
 
     // Chamada da API - Lista todos os materiais
@@ -30,8 +31,15 @@ export default function KitMaterial() {
         }
     };
 
-    const handleEdit = (id_estoque_est) => {
-        const edit = regs.filter((reg) => reg.id_estoque_est == id_estoque_est)[0];
+    const handleEdit = (id_combo) => {
+        let edit = regs.filter((reg) => reg.id_combo == id_combo)[0];
+        edit = {
+            id_combo_cmb: edit.id_combo,
+            des_combo_cmb: edit.desc_combo,
+            id_centro_custo_cmb: edit.id_centro_custo,
+            vlr_combo_cmb: formatCurrencyString((edit.vlr_combo_cmb * 100).toString()),
+            materiaisOriginais: edit.materiais,
+        }
         setRegEdited(edit)
         setModalIsOpen(true);
     }
@@ -41,16 +49,16 @@ export default function KitMaterial() {
         <Content>
             <PageHeader
                 onClick={() => {
-                    setRegEdited({});
+                    setRegEdited(null);
                     setModalIsOpen(true)
                 }}
                 adicionar='Novo'
                 exportar='Exportar'
-                exportFilename='export_estoque'
-                dataset={regs.map(reg=>({'ID':reg.id_estoque_est, 'Descrição': reg.des_estoque_est,'Centro de Custo': reg.id_centro_custo_est,'Data Criação': formatDate(reg.created_at)}))}
+                exportFilename='export_combo'
+                dataset={regs.map(reg=>({'ID':reg.id_combo, 'Descrição': reg.desc_combo,'Centro de Custo': reg.des_centro_custo_cco, 'Data Criação': formatDate(reg.created_at)}))}
             />
             <KitTable totalRows={totalRows} data={regs} handleEdit={handleEdit} refresh={fetchServices}/>
-            {modalIsOpen && <KitForm reg={regEdited} onClose={() => { setModalIsOpen(false) }} visible={modalIsOpen} refresh={fetchServices}/>}
+            {modalIsOpen && <KitForm kitEditing={regEdited} onClose={() => { setModalIsOpen(false) }} visible={modalIsOpen} refresh={fetchServices}/>}
         </Content>
     )
 }

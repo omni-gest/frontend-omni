@@ -4,6 +4,10 @@ export async function createComboMaterial(request) {
     return await api.post("/combo", request);
 }
 
+export async function updateComboMaterial(request) {
+    return await api.put("/combo", request);
+}
+
 export async function getComboMateriais(filter, pageNumber, totalSize, id_centro_custo) {
     const params = {
         filter: filter || "",

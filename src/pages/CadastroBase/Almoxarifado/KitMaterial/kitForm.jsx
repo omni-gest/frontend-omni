@@ -9,8 +9,14 @@ import { saveEstoque } from "../../../../services/estoque";
 import { FormGroup } from "./style";
 import SelectBox from "../../../../components/Select";
 import { getMaterial } from "../../../../services/material";
-import { createComboMaterial } from "../../../../services/comboMaterial";
-import { formatCurrencyString, parseCurrencyToInt } from "../../../../utils/format";
+import {
+  createComboMaterial,
+  updateComboMaterial,
+} from "../../../../services/comboMaterial";
+import {
+  formatCurrencyString,
+  parseCurrencyToInt,
+} from "../../../../utils/format";
 
 const schema = yup.object().shape({
   des_combo_cmb: yup.string().min(1).required(),
@@ -20,13 +26,37 @@ const schema = yup.object().shape({
 export default function KitForm({ kitEditing, onClose, visible, refresh }) {
   const [form, setForm] = useState(kitEditing ?? {});
   const [error, setError] = useState({});
-  const [kitValue, setKitValue] = useState({});
+  const [kitValue, setKitValue] = useState(
+    kitEditing?.vlr_combo_cmb
+      ? parseInt(parseCurrencyToInt(kitEditing.vlr_combo_cmb))
+      : 0
+  );
   const [formData, setFormData] = useState({});
   const [materiaisOriginais, setMateriaisOriginais] = useState([]);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const isEditing = kitEditing ?? false;
 
   useEffect(() => {
+    console.log(isEditing)
+    if (isEditing) {
+      setForm((prev) => ({
+        ...prev,
+        materiais: kitEditing.materiaisOriginais.map((material) => ({
+          value: material.id_material,
+          label: `${material.nome_material} - ${material.nome_unidade}`,
+          custom: [
+            {
+              prefixDefault: material.nome_unidade,
+              label: "Quantidade",
+              column: "qtd_material_cbm",
+              value: material.qtd_material,
+              type: "number",
+            },
+          ],
+        })),
+      }));
+      setMateriaisOriginais(kitEditing.materiaisOriginais);
+    }
     const fetchData = async () => {
       try {
         const centroCusto = await getCentroCusto();
@@ -38,7 +68,32 @@ export default function KitForm({ kitEditing, onClose, visible, refresh }) {
         );
         setFormData({ centroCusto: centroCustoTypeOptions });
         if (isEditing) {
-          setMateriaisOriginais(materiais);
+          getMaterial(true, kitEditing.id_centro_custo_cmb).then((materiais) => {
+            const materialOptions = materiais
+              .map((item) => {
+                return {
+                  id_material_cbm: item.id_material_mte,
+                  des_material_mte: item.des_material_mte,
+                  des_reduz_unidade_und: item.des_reduz_unidade_und,
+                };
+              })
+              .map((item) => {
+                return {
+                  value: { id_material_cbm: item.id_material_cbm },
+                  label: `${item.des_material_mte} - ${item.des_reduz_unidade_und}`,
+                  custom: [
+                    {
+                      prefixDefault: item.des_reduz_unidade_und,
+                      label: "Quantidade",
+                      column: "qtd_material_cbm",
+                      value: 1,
+                      type: "number",
+                    },
+                  ],
+                };
+              });
+            setFormData((prev) => ({ ...prev, materiais: materialOptions }));
+          });
         }
       } catch (error) {
         console.error("Erro ao buscar:", error);
@@ -74,7 +129,7 @@ export default function KitForm({ kitEditing, onClose, visible, refresh }) {
                   column: "qtd_material_cbm",
                   value: 1,
                   type: "number",
-                }
+                },
               ],
             };
           });
@@ -82,83 +137,55 @@ export default function KitForm({ kitEditing, onClose, visible, refresh }) {
       });
     }
 
-    if (eventName == "materiais" && !isEditing) {
+    if (eventName == "materiais") {
       const materiais = value.map((material) => {
         return {
-          id_material_cbm: material.value.id_material_cbm,
+          id_material_cbm: material.value.id_material_cbm ?? material.value,
           qtd_material_cbm: material.custom[0].value,
         };
       });
-    setForm((prev) => ({ ...prev, [eventName]: materiais }));
+      setForm((prev) => ({ ...prev, [eventName]: materiais }));
     }
 
-    if (eventName == "materiais" && isEditing) {
-      const materiaisSelecionados = value.map((material) => {
-        return {
-          id_material_cbm: material.value.id_material_cbm,
-          qtd_material_cbm: material.custom[0].value,
-        };
-      });
-
-      const materiaisInserir = materiaisSelecionados.filter((l) => !l.id);
-      const materiaisAtualizar = materiaisSelecionados
-        .filter((material) => material.id)
-        .map((material) => {
-          return {
-            id_material_cbm: material.id_material_cbm,
-            qtd_material_cbm: Number(material.qtd_material_cbm),
-            vlr_unit_material_cbm: material.vlr_unit_material_cbm,
-          };
-        });
-      const idsMateriaisSelecionados = materiaisSelecionados
-        .filter((material) => material.id)
-        .map((material) => material.id);
-      const materiaisExcluir = materiaisOriginais.filter(
-        (materialOriginal) =>
-          !idsMateriaisSelecionados.includes(materialOriginal.id)
-      );
-      /*  inputData.idsMateriaisExcluir = materiaisExcluir.map(
-        (material) => material.id
-      );
-      inputData.materiaisAtualizar = materiaisAtualizar;
-      inputData.materiaisInserir = materiaisInserir;
-    */
-    }
-    if(eventName == "vlr_combo_cmb") {
-      value = parseInt(parseCurrencyToInt(event.target.value))
-      const formattedValue  = formatCurrencyString(event.target.value);
-      setKitValue(value)
-      setForm((prev) => ({ ...prev, [eventName]: formattedValue}));
+    if (eventName == "vlr_combo_cmb") {
+      value = parseInt(parseCurrencyToInt(event.target.value));
+      const formattedValue = formatCurrencyString(event.target.value);
+      setKitValue(value);
+      setForm((prev) => ({ ...prev, [eventName]: formattedValue }));
     }
   };
 
   const handleSubmit = async (event) => {
     setLoadingSubmit(true);
-    setTimeout(async () => {
-      try {
-        form.vlr_combo_cmb = kitValue;
-        const success = await createComboMaterial(form);
-
-        if (success) {
-          await refresh();
-          toast.success("Registro salvo!");
-        } else {
-          toast.error("Ocorreu um erro ao salvar o registro!");
-        }
-
-        setError({});
-      } catch (err) {
-        let objError = {};
-        err.errors.forEach((e) => {
-          const [inputError, ...error] = e.split(" ");
-          objError = { ...objError, [inputError]: error.join(" ") };
-        });
-
-        setError(objError);
-      } finally {
-        setLoadingSubmit(false);
+    try {
+      let body = { ...form };
+      body.vlr_combo_cmb = kitValue;
+      let success;
+      if (!isEditing) {
+        success = await createComboMaterial(body);
+      } else {
+        success = await updateComboMaterial(body);
       }
-    }, 1000);
+
+      if (success) {
+        await refresh();
+        toast.success("Registro salvo!");
+      } else {
+        toast.error("Ocorreu um erro ao salvar o registro!");
+      }
+
+      setError({});
+    } catch (err) {
+      let objError = {};
+      err.errors.forEach((e) => {
+        const [inputError, ...error] = e.split(" ");
+        objError = { ...objError, [inputError]: error.join(" ") };
+      });
+
+      setError(objError);
+    } finally {
+      setLoadingSubmit(false);
+    }
   };
 
   return (
@@ -196,7 +223,7 @@ export default function KitForm({ kitEditing, onClose, visible, refresh }) {
           placeholder="R$ 0,00"
           maxLength={16}
           value={form?.vlr_combo_cmb ?? ""}
-          name='vlr_combo_cmb'
+          name="vlr_combo_cmb"
           onChange={handleChangeValue}
           error={error?.vlr_combo_cmb ?? false}
         />
