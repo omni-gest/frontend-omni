@@ -115,3 +115,24 @@ export const FormGroup = styled.div`
     font-size: 0.9rem;
   }
 `
+export const ModalScroll = styled.div`
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  max-height: 85dvh;
+`;
+
+export const TableHeader = styled.th`
+  background-color: #f2f2f2;
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+`;
+
+export const TableCell = styled.td`
+  border: 1px solid #ddd;
+  text-align: center;
+  padding: 8px;
+  width: 25%;
+`;
+
+

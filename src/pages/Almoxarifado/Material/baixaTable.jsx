@@ -5,6 +5,7 @@ import { deleteBaixa } from "../../../services/baixa";
 import { confirmAlert } from "../../../utils/alert";
 import { Button } from './style';
 import Modal from '../../../components/Modal'; // Ajuste o caminho conforme necessário
+import { VerMateriais } from "./verMateriais";
 
 export default function BaixaTable({ data = [], handleEdit, refresh }) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -77,12 +78,13 @@ export default function BaixaTable({ data = [], handleEdit, refresh }) {
     <>
       <Table columns={columns} data={data} />
       {selectedRow && (
-        <Modal
+        <VerMateriais
           title="Materiais"
+          materiais={selectedRow.materiais || []}
           visible={modalVisible}
           onClose={closeModal}
         >
-        </Modal>
+        </VerMateriais>
       )}
     </>
   );
