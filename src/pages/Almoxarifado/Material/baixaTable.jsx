@@ -77,11 +77,12 @@ export default function BaixaTable({ data = [], handleEdit, refresh }) {
   return (
     <>
       <Table columns={columns} data={data} />
-      {selectedRow && (
+      {modalVisible && (
         <VerMateriais
           title="Materiais"
           materiais={selectedRow.materiais || []}
           visible={modalVisible}
+          setVisible={setModalVisible}
           onClose={closeModal}
         >
         </VerMateriais>
