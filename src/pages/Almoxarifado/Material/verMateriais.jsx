@@ -12,7 +12,7 @@ export function VerMateriais({ materiais, visible, setVisible }) {
 
   return (
     <ModalContainer>
-      <ModalContent>
+      <ModalContent style={{ maxWidth: 600, maxHeight: 500 }}>
         <ModalScroll>
           <ModalHeader>
             <h2>Materiais movimentados</h2>
@@ -21,12 +21,19 @@ export function VerMateriais({ materiais, visible, setVisible }) {
           <DeviderHorizontal />
           <div
             style={{
-              maxHeight: "350px",
+              maxHeight: "300px",
               overflowY: "auto",
               background: "#fff",
+              width: "100%",
             }}
           >
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                tableLayout: "fixed",
+              }}
+            >
               <thead>
                 <tr>
                   <th
@@ -53,7 +60,11 @@ export function VerMateriais({ materiais, visible, setVisible }) {
                 {materiais.map((material) => (
                   <tr key={material.id_material}>
                     <td
-                      style={{ borderBottom: "1px solid #eee", padding: "8px" }}
+                      style={{
+                        borderBottom: "1px solid #eee",
+                        padding: "8px",
+                        wordBreak: "break-word",
+                      }}
                     >
                       {material.des_material_mte}
                     </td>
