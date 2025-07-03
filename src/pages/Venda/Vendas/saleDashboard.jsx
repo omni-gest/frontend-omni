@@ -248,8 +248,8 @@ export default function SaleDashboard() {
                     <CheckboxGroup>
                         <TriggerButton
                             label="Hoje"
-                            active={dateFilter === 1}
-                            onClick={() => setDateFilter(1)}
+                            active={dateFilter === 0}
+                            onClick={() => setDateFilter(0)}
                         />
                         <TriggerButton
                             label="Última Semana"
