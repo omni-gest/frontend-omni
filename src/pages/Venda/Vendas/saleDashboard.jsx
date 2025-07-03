@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import BarChart from '../../../components/BarGraph';
 import Content from "../../../components/Content";
 import SelectBox from "../../../components/Select";
+import { CardsContainer, Card } from "./style.js";
 import { formatCurrency } from "../../../utils/format.js";
 
 import TriggerButton from "../../../components/TriggerButton";
@@ -11,7 +12,8 @@ import {
     getTopFuncionariosPorVenda,
     getTopVendasPorCentroCusto,
     getTopVendasPorCliente,
-    getTotalVendasPorOrigemCliente
+    getTotalVendasPorOrigemCliente,
+    getTotalSale
 } from "../../../services/graphs";
 import {
     ChartContainer,
@@ -27,6 +29,7 @@ import PieChart from "../../../components/PieChart";
 import { format } from "date-fns";
 
 export default function SaleDashboard() {
+    const [cardData, setCardData] = useState([]);
     const [costCenters, setCostCenters] = useState([]);
     const [topTenSalesGraphData, setTopTenSalesGraphData] = useState([]);
     const [topTenSalesValueGraphData, setTopTenSalesValueGraphData] = useState([]);
@@ -36,6 +39,13 @@ export default function SaleDashboard() {
     const [totalVendasPorOrigemCliente, setTotalVendasPorOrigemCliente] = useState([]);
     const [selectedCostCenters, setSelectedCostCenters] = useState([]);
     const [dateFilter, setDateFilter] = useState(30);
+
+    const fetchTotalSalesDashboard = async () => {
+        const pastDate = new Date();
+        pastDate.setDate(pastDate.getDate() - dateFilter);
+        const response = await getTotalSale(selectedCostCenters.join(","), `${format(pastDate, 'yyyy-MM-dd')} 00:00:00`, `${format(new Date(), 'yyyy-MM-dd')} 23:59:59`);
+        setCardData(response);
+    };
 
     const fetchSaleDashboard = async () => {
         const pastDate = new Date();
@@ -212,6 +222,7 @@ export default function SaleDashboard() {
     }, []);
 
     useEffect(() => {
+        fetchTotalSalesDashboard();
         fetchSaleDashboard();
         fetchSaleValueDashboard();
         fetchTopFuncionariosPorVenda();
@@ -252,6 +263,23 @@ export default function SaleDashboard() {
                         />
                     </CheckboxGroup>
                 </FilterContainer>
+                <CardsContainer>
+                    <Card>
+                        <h3>Total de Vendas Finalizadas</h3>
+                        <p>{cardData?.total_vendas !== null ? cardData?.total_vendas : '-'}</p>
+                    </Card>
+                    <Card>
+                        <h3>Valor total de Vendas Finalizadas</h3>
+                        <p>
+                            {cardData?.valor_total !== null
+                            ? (cardData.valor_total / 100).toLocaleString('pt-BR', {
+                                style: 'currency',
+                                currency: 'BRL'
+                            })
+                            : '-'}
+                        </p>
+                    </Card>
+                </CardsContainer>
                 <ChartContainer>
                     <SmallChartWrapper>
                         <BarChart

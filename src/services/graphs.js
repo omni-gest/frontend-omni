@@ -81,6 +81,15 @@ const getTotalVendasPorOrigemCliente = async (cost_center, initial_date, final_d
     }
 };
 
+const getTotalSale = async (cost_center, initial_date, final_date) => {
+    try {
+        const response = await api.get(`/venda/totalVendas?centros_custo=${cost_center}&data_inicio=${initial_date}&data_fim=${final_date}`);
+        return response.data;
+    } catch (error) {
+        console.error("Erro ao buscar:", error);
+    }
+};
+
 export {
     getServiceDashboard,
     getTopSevenServicesTypes,
@@ -90,5 +99,6 @@ export {
     getTopFuncionariosPorVenda,
     getTopVendasPorCentroCusto,
     getTopVendasPorCliente,
-    getTotalVendasPorOrigemCliente
+    getTotalVendasPorOrigemCliente,
+    getTotalSale
 };
