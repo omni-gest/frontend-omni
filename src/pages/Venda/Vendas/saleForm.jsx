@@ -129,13 +129,6 @@ export default function SaleForm({ saleEditing, onClose, visible }) {
               value: combo.qtd_combo,
               type: "number",
             },
-            {
-              label: "Valor Unitário",
-              column: "vlr_combo_cmb",
-              value: combo.vlr_combo_cmb,
-              type: "number",
-              mask: "currency",
-            },
           ],
         };
       });
@@ -183,13 +176,6 @@ export default function SaleForm({ saleEditing, onClose, visible }) {
                 column: "qtd_combo_cmb",
                 value: 1,
                 type: "number",
-              },
-              {
-                label: "Valor Unitário",
-                column: "vlr_combo_cmb",
-                value: combo.vlr_combo_cmb,
-                type: "number",
-                mask: "currency",
               },
             ],
           };
@@ -335,7 +321,6 @@ export default function SaleForm({ saleEditing, onClose, visible }) {
           id: combo.value.id,
           id_combo: combo.value.id_combo ?? combo.value,
           qtd_combo: combo.custom[0].value,
-          vlr_combo_cmb: parseInt(combo.custom[1].value),
         };
       });
 
@@ -346,7 +331,6 @@ export default function SaleForm({ saleEditing, onClose, visible }) {
           id: combo.id,
           id_combo: combo.id_combo,
           qtd_combo: Number(combo.qtd_combo),
-          vlr_combo_cmb: combo.vlr_combo_cmb,
         }));
 
       const idsCombosSelecionados = combosSelecionados
@@ -406,13 +390,6 @@ export default function SaleForm({ saleEditing, onClose, visible }) {
                 column: "qtd_combo_cmb",
                 value: 1,
                 type: "number",
-              },
-              {
-                label: "Valor Unitário",
-                column: "vlr_combo_cmb",
-                value: combo.vlr_combo_cmb,
-                type: "number",
-                mask: "currency",
               },
             ],
           };
