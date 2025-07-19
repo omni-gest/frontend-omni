@@ -440,12 +440,11 @@ export default function SaleForm({ saleEditing, onClose, visible }) {
               ],
             };
           });
-
+        setClientesSelect(clienteOptions);
         setFormData((form) => ({
           ...form,
           employees: funcionarioTypeOptions,
           materiais: materialOptions,
-          clientes: clienteOptions,
           estoques: estoqueOptions,
           comboMateriais: comboMateriaisOptions,
         }));
