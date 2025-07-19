@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 
 import ButtonSubmit from "../../../components/Buttons/ButtonSubmit";
 import SelectBox from "../../../components/Select";
+import SelectBoxV2 from "../../../components/SelectV2";
 import { getEmployee } from "../../../services/employee";
 import { getSale, getSaleProducts } from "../../../services/sale";
 import { Expand, FormGroup } from "./style";
@@ -25,6 +26,7 @@ export default function SaleForm({ saleEditing, onClose, visible }) {
   const [form, setForm] = useState(saleEditing);
   const [inputData, setInputData] = useState(saleEditing ?? {});
   const [formData, setFormData] = useState({});
+  const [clientesSelect, setClientesSelect] = useState([]);
   const [formChanged, setFormChanged] = useState({});
   const [materiaisOriginais, setMateriaisOriginais] = useState([]);
   const [combosOriginais, setCombosOriginais] = useState([]);
@@ -136,7 +138,7 @@ export default function SaleForm({ saleEditing, onClose, visible }) {
       Promise.all([
         getMaterial(true, form.id_centro_custo_vda),
         getEmployee(form.id_centro_custo_vda),
-        getCliente(form.id_centro_custo_vda),
+        getCliente(form.id_centro_custo_vda, 0, 999),
         getEstoque("", 0, 999, form.id_centro_custo_vda),
         getComboMateriais("", 0, 999, form.id_centro_custo_vda),
       ]).then(([materiais, employees, clientes, estoques, comboMateriais]) => {
@@ -222,12 +224,13 @@ export default function SaleForm({ saleEditing, onClose, visible }) {
               ],
             };
           });
+        
+        setClientesSelect(clienteOptions);
 
         setFormData((form) => ({
           ...form,
           employees: funcionarioTypeOptions,
           materiais: materialOptions,
-          clientes: clienteOptions,
           estoques: estoqueOptions,
           comboMateriais: comboMateriaisOptions,
           centroCusto: centroCustoTypeOptions,
@@ -241,6 +244,7 @@ export default function SaleForm({ saleEditing, onClose, visible }) {
 
       setForm(form);
     } else {
+      setClientesSelect([])
       setFormData({
         employees: [],
         materiais: [],
@@ -450,6 +454,10 @@ export default function SaleForm({ saleEditing, onClose, visible }) {
     setFormChanged(!formChanged);
   };
 
+  const handleClienteChange = (event) => {
+    console.log(event)
+  }
+
   const handleSubmit = async () => {
     setLoadingSubmit(true);
     try {
@@ -491,6 +499,24 @@ export default function SaleForm({ saleEditing, onClose, visible }) {
 
     inputData.id_cliente_vda = novoCliente.id;
   }
+
+  async function getClientesSelect(filter) {
+    const clientes = await getCliente(inputData.id_centro_custo_vda, 0, 10, filter).then((clientes) => {
+      return clientes.items.map((cliente) => {
+        return {
+              value: cliente.id_cliente_cli,
+              label: `${cliente.des_cliente_cli} - ${
+                cliente.telefone_cliente_cli == ""
+                  ? cliente.documento_cliente_cli
+                  : cliente.telefone_cliente_cli
+              }`,
+            };
+      });
+    });
+    setClientesSelect(clientes);
+    return clientes;
+  };
+
   if (loading) {
     return (
       <Modal
@@ -536,11 +562,13 @@ export default function SaleForm({ saleEditing, onClose, visible }) {
 
       <FormGroup>
         <label>Cliente</label>
-        <SelectBox
-          options={formData?.clientes ?? []}
+        <SelectBoxV2
+          options={clientesSelect}
+          getOptions={getClientesSelect}
+          setOptions={setClientesSelect}
           defaultValue={form?.id_cliente_vda ?? []}
           name="id_cliente_vda"
-          onChange={handleChangeValue}
+          onChange={handleClienteChange}
           error={""}
           limit={1}
           setDefaultValue={true}

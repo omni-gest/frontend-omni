@@ -98,7 +98,7 @@ export default function ServiceForm({ service, onClose, visible }) {
     setForm((prev) => ({ ...prev, [inputName]: value }));
 
     if (event.target.name === "id_centro_custo_ser") {
-          Promise.all([getServiceType(value), getEmployee(value), getCliente(value)]).then(
+          Promise.all([getServiceType(value), getEmployee(value), getCliente(value, 0, 999)]).then(
         ([servicesType, employees, clientes]) => {
           const serviceTypeOptions = servicesType.map(
             ({

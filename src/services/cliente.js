@@ -2,9 +2,17 @@
 import api from "./api";
 
 
-const getCliente = async (id_centro_custo = null) => {
+let cachedPageNumber = 1;
+let cachedPerPage = 10;
+let cachedFilter = ''
+
+const getCliente = async (id_centro_custo = null, pageNumber, perPage, filter) => {
+    cachedPageNumber = pageNumber ?? cachedPageNumber;
+    cachedPerPage = perPage ?? cachedPerPage;
+    cachedFilter = filter ?? cachedFilter;
+
     try {
-        const response = await api.get(`/cliente?id_centro_custo_cli=${id_centro_custo}`);
+        const response = await api.get(`/cliente?id_centro_custo_cli=${id_centro_custo}&per_page=${cachedPerPage}&page_number=${cachedPageNumber}&filter=${cachedFilter}`);
 
         return response.data;
     } catch (error) {
