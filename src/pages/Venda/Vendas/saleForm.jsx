@@ -454,7 +454,8 @@ export default function SaleForm({ saleEditing, onClose, visible }) {
   };
 
   const handleClienteChange = (event) => {
-    console.log(event)
+    inputData.id_cliente_vda = event.target.value;
+    setFormChanged(!formChanged);
   }
 
   const handleSubmit = async () => {
