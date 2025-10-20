@@ -141,19 +141,17 @@ export default function SaleDashboard() {
 
   const fetchAll = async () => {
     setLoading(true);
-    try {
-      await Promise.all([
-        fetchTotalSalesDashboard(),
-        fetchSaleDashboard(),
-        fetchSaleValueDashboard(),
-        fetchTopFuncionariosPorVenda(),
-        fetchTopVendasPorCentroCusto(),
-        fetchTotalVendasPorOrigemCliente(),
-        fetchTopVendasPorCliente(),
-      ]);
-    } finally {
-      setLoading(false);
-    }
+    Promise.all([
+      fetchTotalSalesDashboard(),
+      fetchSaleDashboard(),
+      fetchSaleValueDashboard(),
+      fetchTopFuncionariosPorVenda(),
+      fetchTopVendasPorCentroCusto(),
+      fetchTotalVendasPorOrigemCliente(),
+      fetchTopVendasPorCliente(),
+    ]).then(() => {
+        setLoading(false);
+    })
   };
 
   const formatCostCenters = async () => {
@@ -386,7 +384,7 @@ export default function SaleDashboard() {
                   animation: "sd-spin 1s linear infinite",
                 }}
               />
-              <div style={{ fontWeight: 600 }}>Carregando dados...</div>
+              <div style={{ fontWeight: 600 }}>Carregando...</div>
             </div>
             <style>{`@keyframes sd-spin { to { transform: rotate(360deg); } }`}</style>
           </div>
@@ -439,11 +437,21 @@ export default function SaleDashboard() {
                 </div>
               </div>
               <div
-                style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  gap: 8,
+                }}
               >
                 <button
                   onClick={() => setShowDynamicModal(false)}
-                  style={{ padding: "6px 10px" }}
+                  style={{
+                    padding: "6px 10px",
+                    background: "#c8c8c8",
+                    color: "#000000",
+                    border: "none",
+                    borderRadius: 4,
+                  }}
                 >
                   Cancelar
                 </button>
